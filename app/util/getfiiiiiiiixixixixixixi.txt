@@ -1,0 +1,74 @@
+async function fetchFixturesByLeague(year: number, league: number, yearr: number): Promise<Fixture[]> { 
+    const url = `https://v3.football.api-sports.io/fixtures?league=${league}&season=${year + yearr}`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': API_KEY,
+        },
+        next: {
+            // revalidate data every 24 hours
+            revalidate: 1 * 1 * 15
+        }
+    };
+
+    try {
+        const response = await fetch(url, options);
+        const data = await response.json();
+        const fixtures: Fixture[] = data.response;
+
+        if (fixtures === null || fixtures === undefined) {
+            return [fixtures];
+        } else {
+            return fixtures;
+        }
+    } catch (err) {
+        console.log(`Error fetching ${league} fixtures in year ${year}: ${err}`);
+        return [];
+    }
+}
+
+export default async function getFixtures(): Promise<AllFixtures[]> {
+
+    try {
+        const allFixturesByLeague: AllFixtures[] = [];
+
+        for (const league of leagues) {
+            const cacheKey = `fixtures:league-${league.league}`;
+const cachedDataPromise = redis.get(cacheKey); // Fetch async immediately
+
+const cachedData = await cachedDataPromise; // Wait here, but started fetching earlier
+
+if (cachedData) {
+    console.log(`✅ Returning cached data for ${league.name} from Redis`);
+    allFixturesByLeague.push({
+        name: league.name,
+        fixtures: typeof cachedData === "string" ? JSON.parse(cachedData) : cachedData,
+    });
+    continue; // Skip API call
+}
+else {
+                // Fetch fresh data if no cached data
+                console.log(`⏳ Fetching fresh data for ${league.name}...`);
+                const currentTime = moment();
+                const year = currentTime.year();
+                const month = currentTime.month();
+
+                const fixtures = await fetchFixturesByLeague(year, league.league, league.yearr);
+                
+         // Store the fetched data for this league separately in Redis with a TTL of 5 minutes (300 seconds)
+        await redis.set(cacheKey, JSON.stringify(fixtures), { ex: 64800 });
+
+
+                allFixturesByLeague.push({
+                    name: league.name,
+                    fixtures,
+                });
+            }
+        }
+
+        return allFixturesByLeague;
+    } catch (error) {
+        console.error("An error occurred while fetching fixtures: ", error);
+        throw error;
+    }
+}

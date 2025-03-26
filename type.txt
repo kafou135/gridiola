@@ -1,0 +1,49 @@
+
+  "response": [
+    {
+      "time": {
+        "elapsed": 25,
+        "extra": null
+      },
+      "team": {
+        "id": 463,
+        "name": "Aldosivi",
+        "logo": "https://media.api-sports.io/football/teams/463.png"
+      },
+      "player": {
+        "id": 6126,
+        "name": "F. Andrada"
+      },
+      "assist": {
+        "id": null,
+        "name": null
+      },
+      "type": "Goal",
+      "detail": "Normal Goal",
+      "comments": null
+    },
+    
+  ]
+
+type Events ={
+    time: {
+        elapsed: number,
+        extra: number
+      },
+      team: {
+        id: number,
+        name: string,
+        logo: string
+      },
+      player: {
+        id: number,
+        name: string
+      },
+      assist: {
+        id: number,
+        name: string
+      },
+      type: string,
+      detail: string,
+      comments: string    
+}

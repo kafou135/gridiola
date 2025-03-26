@@ -1,0 +1,360 @@
+import { AllFixtures, Fixture } from "@/types";
+import moment from 'moment';
+import { Redis } from "@upstash/redis";
+
+const API_KEY = process.env.API_KEY as string;
+
+// Redis setup
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+if (!REDIS_URL || !REDIS_TOKEN) {
+  throw new Error("🚨 Redis environment variables are missing.");
+}
+
+const redis = new Redis({
+  url: REDIS_URL,
+  token: REDIS_TOKEN,
+});
+
+const leagues = [
+    
+    {league: 39, yearr:-1, startmonth: 8, endmonth: 5, country: "England", name: "EPL"},
+    {league: 140,yearr:-1,startmonth: 8,endmonth: 5,country: "Spain",name: "EPL"},
+    {league: 78, yearr:-1, startmonth: 8, endmonth: 5, country: "Germany", name: "EPL"},
+    {league: 135, yearr:-1, startmonth: 8, endmonth: 5, country: "Italy", name: "EPL"},
+    {league: 61,yearr:-1,startmonth: 8,endmonth: 5,country: "France",name: "EPL"},
+    {league: 311,yearr: -1,startmonth: 8,endmonth: 4,name: "EPL"},
+    {league: 512,yearr: -1,startmonth: 9,endmonth: 4,name: "EPL"},
+    {league: 513,yearr: -1,startmonth: 9,endmonth: 4,name: "EPL"},
+    {league: 707,yearr: -1,startmonth: 9,endmonth: 4,name: "EPL"},
+    {league: 708,yearr: -1,startmonth: 12,endmonth: 12,name: "EPL"},
+    {league: 310,yearr: -1,startmonth: 8,endmonth: 5,name: "EPL"},
+    {league: 514,yearr: -1,startmonth: 12,endmonth: 3,name: "EPL"},
+    {league: 186,yearr: -1,startmonth: 9,endmonth: 5,name: "EPL"},
+    {league: 187, yearr:-1, startmonth: 9, endmonth: 5, name: "EPL"},
+  {league: 516, yearr:-1, startmonth: 1, endmonth: 1, name: "EPL"},
+  {league: 515, yearr:-1, startmonth: 9, endmonth: 5, name: "EPL"},
+  {league: 312, yearr:-1, startmonth: 9, endmonth: 5, name: "EPL"},
+  {league: 313, yearr:-1, startmonth: 9, endmonth: 5, name: "EPL"},
+  {league: 655, yearr:-1, startmonth: 1, endmonth: 4, name: "EPL"},
+  {league: 809, yearr:-1, startmonth: 9, endmonth: 9, name: "EPL"},
+  {league: 397, yearr:-1, startmonth: 9, endmonth: 5, name: "EPL"},
+  {league: 1048, yearr:-1, startmonth: 10, endmonth: 3, name: "EPL"},
+  {league: 130, yearr:0, startmonth: 1, endmonth: 6, name: "EPL"},
+  {league: 1032, yearr:-1, startmonth: 1, endmonth: 5, name: "EPL"},
+  {league: 128, yearr:0, startmonth: 1, endmonth: 5, name: "EPL"},
+  {league: 131, yearr:0, startmonth: 2, endmonth: 6, name: "EPL"},
+  {league: 132, yearr:0, startmonth: 3, endmonth: 5, name: "EPL"},
+  {league: 129, yearr:0, startmonth: 2, endmonth: 10, name: "EPL"},
+  {league: 906, yearr:0, startmonth: 2, endmonth: 10, name: "EPL"},
+  {league: 810, yearr:0, startmonth: 3, endmonth: 3, name: "EPL"},
+  {league: 1178, yearr:0, startmonth: 3, endmonth: 3, name: "EPL"},
+  {league: 134, yearr:0, startmonth: 3, endmonth: 7, name: "EPL"},
+  {league: 1067, yearr:-1, startmonth: 2, endmonth: 11, name: "EPL"},
+  {league: 517, yearr:0, startmonth: 12, endmonth: 12, name: "EPL"},
+  {league: 709, yearr:-1, startmonth: 8, endmonth: 4, name: "EPL"},
+  {league: 343, yearr:-1, startmonth: 8, endmonth: 3, name: "EPL"},
+  {league: 342, yearr:-1, startmonth: 8, endmonth: 4, name: "EPL"},
+  {league: 654, yearr:-1, startmonth: 2, endmonth: 2, name: "EPL"},
+  {league: 421, yearr:-1, startmonth: 9, endmonth: 5, name: "EPL"},
+  {league: 188, yearr:-1, startmonth: 10, endmonth: 5, name: "EPL"},
+  {league: 190, yearr:-1, startmonth: 11, endmonth: 4, name: "EPL"},
+  {league: 874, yearr:-1, startmonth: 7, endmonth: 10, name: "EPL"},
+  {league: 191, yearr:0, startmonth: 2, endmonth: 8, name: "EPL"},
+  {league: 189, yearr:0, startmonth: 3, endmonth: 8, name: "EPL"},
+  {league: 1092, yearr:0, startmonth: 4, endmonth: 8, name: "EPL"},
+  {league: 192, yearr:0, startmonth: 2, endmonth: 8, name: "EPL"},
+  {league: 835, yearr:0, startmonth: 2, endmonth: 8, name: "EPL"},
+  {league: 1090, yearr:0, startmonth: 3, endmonth: 8, name: "EPL"},
+  {league: 481, yearr:0, startmonth: 2, endmonth: 8, name: "EPL"},
+  {league: 193, yearr:-1, startmonth: 3, endmonth: 9, name: "EPL"},
+  {league: 482, yearr:0, startmonth: 2, endmonth: 8, name: "EPL"},
+  {league: 833, yearr:0, startmonth: 2, endmonth: 8, name: "EPL"},
+  {league: 194, yearr:0, startmonth: 2, endmonth: 8, name: "EPL"},
+  {league: 834, yearr:0, startmonth: 2, endmonth: 8, name: "EPL"},
+  {league: 1091, yearr:0, startmonth: 3, endmonth: 8, name: "EPL"},
+  {league: 648, yearr:0, startmonth: 3, endmonth: 9, name: "EPL"},
+  {league: 1093, yearr:0, startmonth: 3, endmonth: 8, name: "EPL"},
+  {league: 195, yearr:0, startmonth: 2, endmonth: 8, name: "EPL"},
+  {league: 836, yearr:0, startmonth: 2, endmonth: 8, name: "EPL"},
+  {league: 196, yearr:0, startmonth: 3, endmonth: 8, name: "EPL"},
+  {league: 1094, yearr:0, startmonth: 3, endmonth: 8, name: "EPL"},
+  {league: 219, yearr:-1, startmonth: 8, endmonth: 5, name: "EPL"},
+  {league: 218, yearr:-1, startmonth: 7, endmonth: 5, name: "EPL"},
+  {league: 218,yearr:-1,startmonth: 8,endmonth: 3,country: "Austria",name: "EPL"},
+  {league: 220,yearr:-1,startmonth: 7,endmonth: 4,country: "Austria",name: "EPL"},
+  {league: 484,yearr:-1,startmonth: 8,endmonth: 3,country: "Austria",name: "EPL"},
+  {league: 224,yearr:-1,startmonth: 8,endmonth: 6,country: "Austria",name: "EPL"},
+  {league: 225,yearr:-1,startmonth: 8,endmonth: 6,country: "Austria",name: "EPL"},
+  {league: 226,yearr:-1,startmonth: 8,endmonth: 6,country: "Austria",name: "EPL"},
+  {league: 227,yearr:-1,startmonth: 8,endmonth: 6,country: "Austria",name: "EPL"},
+  {league: 228,yearr:-1,startmonth: 8,endmonth: 6,country: "Austria",name: "EPL"},
+  {league: 229,yearr:-1,startmonth: 8,endmonth: 6,country: "Austria",name: "EPL"},
+  {league: 230,yearr:-1,startmonth: 8,endmonth: 6,country: "Austria",name: "EPL"},
+  {league: 231,yearr:-1,startmonth: 8,endmonth: 6,country: "Austria",name: "EPL"},
+  {league: 232,yearr:-1,startmonth: 8,endmonth: 6,country: "Austria",name: "EPL"},
+  {league: 222,yearr:-1,startmonth: 8,endmonth: 6,country: "Austria",name: "EPL"},
+  {league: 221,yearr:-1,startmonth: 8,endmonth: 6,country: "Austria",name: "EPL"},
+  {league: 223,yearr:-1,startmonth: 8,endmonth: 6,country: "Austria",name: "EPL"},
+  {league: 418,yearr:-1,startmonth: 9,endmonth: 5,country: "Azerbaijan",name: "EPL"},
+  {league: 420,yearr:-1,startmonth: 10,endmonth: 4,country: "Azerbaijan",name: "EPL"},
+  {league: 419,yearr:-1,startmonth: 8,endmonth: 5,country: "Azerbaijan",name: "EPL"},
+  {league: 1049,yearr:-1,startmonth: 1,endmonth: 4,country: "Bahrain",name: "EPL"},
+  {league: 417,yearr:-1,startmonth: 9,endmonth: 4,country: "Bahrain",name: "EPL"},
+  {league: 811,yearr:-1,startmonth: 12,endmonth: 4,country: "Bangladesh",name: "EPL"},
+  {league: 398,yearr:0,startmonth: 11,endmonth: 5,country: "Bangladesh",name: "EPL"},
+  {league: 422,yearr:-1,startmonth: 1,endmonth: 5,country: "Barbados",name: "EPL"},
+  {league: 117,yearr:0,startmonth: 3,endmonth: 3,country: "Belarus",name: "EPL"},
+  {league: 118,yearr:-1,startmonth: 4,endmonth: 5,country: "Belarus",name: "EPL"},
+  {league: 486,yearr:-1,startmonth: 5,endmonth: 5,country: "Belarus",name: "EPL"},
+  {league: 116,yearr:0,startmonth: 3,endmonth: 11,country: "Belarus",name: "EPL"},
+  {league: 562,yearr:-1,startmonth: 3,endmonth: 11,country: "Belarus",name: "EPL"},
+  {league: 812,yearr:0,startmonth: 2,endmonth: 2,country: "Belarus",name: "EPL"},
+  {league: 145,yearr:-1,startmonth: 8,endmonth: 4,country: "Belgium",name: "EPL"},
+  {league: 147,yearr:-1,startmonth: 7,endmonth: 5,country: "Belgium",name: "EPL"},
+  {league: 487,yearr:-1,startmonth: 8,endmonth: 5,country: "Belgium",name: "EPL"},
+  {league: 144, yearr:-1, startmonth: 7, endmonth: 3, country: "Belgium", name: "EPL"},
+  {league: 153, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 691, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 154, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 155, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 156, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 157, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 158, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 159, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 160, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 161, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 518, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 148, yearr:-1, startmonth: 8, endmonth: 5, country: "Belgium", name: "EPL"},
+  {league: 149, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 150, yearr:-1, startmonth: 8, endmonth: 4, country: "Belgium", name: "EPL"},
+  {league: 146,yearr: -1,startmonth: 8,endmonth: 3,country: "Belgium",name: "EPL"},
+  {league: 689,yearr: -1,startmonth: 8,endmonth: 4,country: "Belgium",name: "EPL"},
+  {league: 690,yearr: -1,startmonth: 8,endmonth: 4,country: "Belgium",name: "EPL"},
+  {league: 151,yearr: -1,startmonth: 8,endmonth: 4,country: "Belgium",name: "EPL"},
+  {league: 152,yearr: -1,startmonth: 8,endmonth: 4,country: "Belgium",name: "EPL"},
+  {league: 416,yearr: -1,startmonth: 8,endmonth: 3,country: "Belize",name: "EPL"},
+  {league: 415,yearr: -1,startmonth: 9,endmonth: 6,country: "Benin",name: "EPL"},
+  {league: 414,yearr: -1,startmonth: 9,endmonth: 4,country: "Bermuda",name: "EPL"},
+  {league: 1031,yearr: -1,startmonth: 5,endmonth: 10,country: "Bhutan",name: "EPL"},
+  {league: 413,yearr: 0,startmonth: 2,endmonth: 3,country: "Bhutan",name: "EPL"},
+  {league: 710,yearr: -1,startmonth: 8,endmonth: 12,country: "Bolivia",name: "EPL"},
+  {league: 344,yearr: -1,startmonth: 2,endmonth: 12,country: "Bolivia",name: "EPL"},
+  {league: 1172,yearr: 0,startmonth: 2,endmonth: 3,country: "Bolivia",name: "EPL"},
+  {league: 316,yearr: -1,startmonth: 8,endmonth: 6,country: "Bosnia",name: "EPL"},
+  {league: 317, yearr:-1, startmonth: 8, endmonth: 6, country: "Bosnia", name: "EPL"},
+  {league: 314, yearr:-1, startmonth: 10, endmonth: 3, country: "Bosnia", name: "EPL"},
+  {league: 315, yearr:-1, startmonth: 8, endmonth: 3, country: "Bosnia", name: "EPL"},
+  {league: 412, yearr:-1, startmonth: 9, endmonth: 5, country: "Botswana", name: "EPL"},
+  {league: 520, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 77, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1146, yearr:-1, startmonth: 9, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 1110, yearr:-1, startmonth: 5, endmonth: 8, country: "Brazil", name: "EPL"},
+  {league: 521, yearr:0, startmonth: 3, endmonth: 4, country: "Brazil", name: "EPL"},
+  {league: 522, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1134, yearr:-1, startmonth: 8, endmonth: 9, country: "Brazil", name: "EPL"},
+  {league: 602, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 613, yearr:0, startmonth: 4, endmonth: 6, country: "Brazil", name: "EPL"},
+  {league: 1073, yearr:0, startmonth: 3, endmonth: 6, country: "Brazil", name: "EPL"},
+  {league: 741, yearr:-1, startmonth: 9, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 1128, yearr:-1, startmonth: 7, endmonth: 9, country: "Brazil", name: "EPL"},
+  {league: 74, yearr: 0, startmonth: 3, endmonth: 6, country: "Brazil", name: "EPL"},
+  {league: 610, yearr: 0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1141, yearr: -1, startmonth: 8, endmonth: 10, country: "Brazil", name: "EPL"},
+  {league: 1100, yearr: -1, startmonth: 5, endmonth: 7, country: "Brazil", name: "EPL"},
+  {league: 611, yearr: 0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 624, yearr: 0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 625, yearr: -1, startmonth: 9, endmonth: 12, country: "Brazil", name: "EPL"},
+  {league: 851, yearr: -1, startmonth: 5, endmonth: 8, country: "Brazil", name: "EPL"},
+  {league: 1155, yearr: -1, startmonth: 9, endmonth: 12, country: "Brazil", name: "EPL"},
+  {league: 1106, yearr: -1, startmonth: 5, endmonth: 8, country: "Brazil", name: "EPL"},
+  {league: 1114, yearr: -1, startmonth: 6, endmonth: 10, country: "Brazil", name: "EPL"},
+  {league: 604, yearr: 0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 936, yearr: -1, startmonth: 5, endmonth: 8, country: "Brazil", name: "EPL"},
+  {league: 1154, yearr: -1, startmonth: 9, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 1076, yearr: 0, startmonth: 4, endmonth: 8, country: "Brazil", name: "EPL"},
+  {league: 740, yearr: 0, startmonth: 3, endmonth: 7, country: "Brazil", name: "EPL"},
+  {league: 609, yearr: 0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 620, yearr: 0, startmonth: 2, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1124, yearr: -1, startmonth: 6, endmonth: 8, country: "Brazil", name: "EPL"},
+  {league: 1112, yearr: -1, startmonth: 5, endmonth: 9, country: "Brazil", name: "EPL"},
+  {league: 1063, yearr: 0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 73, yearr: 0, startmonth: 2, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1179, yearr: 0, startmonth: 3, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 617, yearr: -1, startmonth: 10, endmonth: 12, country: "Brazil", name: "EPL"},
+  {league: 612, yearr: 0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1097, yearr: 0, startmonth: 4, endmonth: 6, country: "Brazil", name: "EPL"},
+  {league: 1165, yearr: -1, startmonth: 11, endmonth: 12, country: "Brazil", name: "EPL"},
+  {league: 1158, yearr: -1, startmonth: 8, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 742, yearr:-1, startmonth: 6, endmonth: 10, country: "Brazil", name: "EPL"},
+  {league: 1035, yearr:-1, startmonth: 7, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 1082, yearr:0, startmonth: 3, endmonth: 4, country: "Brazil", name: "EPL"},
+  {league: 1036, yearr:-1, startmonth: 9, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 843, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1143, yearr:-1, startmonth: 8, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 477, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 478, yearr:-1, startmonth: 4, endmonth: 8, country: "Brazil", name: "EPL"},
+  {league: 1150, yearr:-1, startmonth: 9, endmonth: 12, country: "Brazil", name: "EPL"},
+  {league: 628, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1030, yearr:-1, startmonth: 4, endmonth: 7, country: "Brazil", name: "EPL"},
+  {league: 1133, yearr:-1, startmonth: 8, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 1069, yearr:0, startmonth: 2, endmonth: 5, country: "Brazil", name: "EPL"},
+  {league: 608, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1148, yearr:-1, startmonth: 9, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 630, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1096, yearr:-1, startmonth: 4, endmonth: 7, country: "Brazil", name: "EPL"},
+  {league: 629, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 619, yearr:0, startmonth: 5, endmonth: 6, country: "Brazil", name: "EPL"},
+  {league: 1142, yearr:-1, startmonth: 8, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 1107, yearr:-1, startmonth: 5, endmonth: 10, country: "Brazil", name: "EPL"},
+  {league: 627, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1145, yearr:-1, startmonth: 9, endmonth: 12, country: "Brazil", name: "EPL"},
+  {league: 1115, yearr:-1, startmonth: 6, endmonth: 10, country: "Brazil", name: "EPL"},
+  {league: 1157, yearr:-1, startmonth: 10, endmonth: 2, country: "Brazil", name: "EPL"},
+  {league: 603, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1037, yearr:-1, startmonth: 8, endmonth: 10, country: "Brazil", name: "EPL"},
+  {league: 1120, yearr:-1, startmonth: 6, endmonth: 8, country: "Brazil", name: "EPL"},
+  {league: 606, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 614, yearr:0, startmonth: 4, endmonth: 6, country: "Brazil", name: "EPL"},
+  {league: 1138, yearr:-1, startmonth: 8, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 1071, yearr:0, startmonth: 3, endmonth: 6, country: "Brazil", name: "EPL"},
+  {league: 475, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 476, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 605, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1062, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1086, yearr:-1, startmonth: 4, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 1098, yearr:0, startmonth: 4, endmonth: 6, country: "Brazil", name: "EPL"},
+  {league: 622, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1125, yearr:-1, startmonth: 6, endmonth: 9, country: "Brazil", name: "EPL"},
+  {league: 1151, yearr:-1, startmonth: 9, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 1088, yearr:-1, startmonth: 4, endmonth: 8, country: "Brazil", name: "EPL"},
+  {league: 621, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 616, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1149, yearr:-1, startmonth: 9, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 1139, yearr:-1, startmonth: 7, endmonth: 9, country: "Brazil", name: "EPL"},
+  {league: 1059, yearr:-1, startmonth: 1, endmonth: 1, country: "Brazil", name: "EPL"},
+  {league: 615, yearr:0, startmonth: 2, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 607, yearr:0, startmonth: 2, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 618, yearr:0, startmonth: 1, endmonth: 1, country: "Brazil", name: "EPL"},
+  {league: 626, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 1135, yearr:-1, startmonth: 8, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 1108, yearr:-1, startmonth: 5, endmonth: 7, country: "Brazil", name: "EPL"},
+  {league: 71, yearr:0, startmonth: 3, endmonth: 12, country: "Brazil", name: "EPL"},
+  {league: 72, yearr:0, startmonth: 4, endmonth: 11, country: "Brazil", name: "EPL"},
+  {league: 75, yearr:0, startmonth: 4, endmonth: 8, country: "Brazil", name: "EPL"},
+  {league: 76, yearr:0, startmonth: 4, endmonth: 7, country: "Brazil", name: "EPL"},
+  {league: 623, yearr:0, startmonth: 1, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 632, yearr:0, startmonth: 2, endmonth: 2, country: "Brazil", name: "EPL"},
+  {league: 631, yearr:0, startmonth: 2, endmonth: 3, country: "Brazil", name: "EPL"},
+  {league: 174, yearr:-1, startmonth: 8, endmonth: 4, country: "Bulgaria", name: "EPL"},
+  {league: 172, yearr:-1, startmonth: 7, endmonth: 4, country: "Bulgaria", name: "EPL"},
+  {league: 173, yearr:-1, startmonth: 7, endmonth: 5, country: "Bulgaria", name: "EPL"},
+  {league: 175, yearr:-1, startmonth: 8, endmonth: 5, country: "Bulgaria", name: "EPL"},
+  {league: 176, yearr:-1, startmonth: 8, endmonth: 5, country: "Bulgaria", name: "EPL"},
+  {league: 177, yearr:-1, startmonth: 8, endmonth: 5, country: "Bulgaria", name: "EPL"},
+  {league: 178,yearr:-1,startmonth: 8,endmonth: 6,country: "Bulgaria",name: "EPL"},
+  {league: 423,yearr:-1,startmonth: 10,endmonth: 5,country: "Burkina-Faso",name: "EPL"},
+  {league: 566,yearr:-1,startmonth: 8,endmonth: 5,country: "Burundi",name: "EPL"},
+  {league: 410,yearr:-1,startmonth: 8,endmonth: 5,country: "Cambodia",name: "EPL"},
+  {league: 1174,yearr:-1,startmonth: 1,endmonth: 4,country: "Cambodia",name: "EPL"},
+  {league: 411,yearr:0,startmonth: 12,endmonth: 5,country: "Cameroon",name: "EPL"},
+  {league: 813,yearr:0,startmonth: 12,endmonth: 4,country: "Cameroon",name: "EPL"},
+  {league: 1166,yearr:-1,startmonth: 11,endmonth: 11,country: "Cameroon",name: "EPL"},
+  {league: 259,yearr:0,startmonth: 4,endmonth: 5,country: "Canada",name: "EPL"},
+  {league: 479,yearr:0,startmonth: 4,endmonth: 10,country: "Canada",name: "EPL"},
+  {league: 258,yearr:-1,startmonth: 6,endmonth: 10,country: "Canada",name: "EPL"},
+  {league: 923,yearr:-1,startmonth: 4,endmonth: 9,country: "Canada",name: "EPL"},
+  {league: 260,yearr:-1,startmonth: 5,endmonth: 7,country: "Canada",name: "EPL"},
+  {league: 267,yearr:0,startmonth: 1,endmonth: 5,country: "Chile",name: "EPL"},
+  {league: 266,yearr:0,startmonth: 2,endmonth: 11,country: "Chile",name: "EPL"},
+  {league: 265,yearr:0,startmonth: 2,endmonth: 12,country: "Chile",name: "EPL"},
+  {league: 711, yearr:0, startmonth: 3, endmonth: 11, country: "Chile", name: "EPL"},
+  {league: 527, yearr:0, startmonth: 1, endmonth: 1, country: "Chile", name: "EPL"},
+  {league: 171, yearr:0, startmonth: 3, endmonth: 4, country: "China", name: "EPL"},
+  {league: 170, yearr:0, startmonth: 3, endmonth: 11, country: "China", name: "EPL"},
+  {league: 929, yearr:-1, startmonth: 3, endmonth: 10, country: "China", name: "EPL"},
+  {league: 972, yearr:0, startmonth: 2, endmonth: 2, country: "China", name: "EPL"},
+  {league: 169, yearr:0, startmonth: 2, endmonth: 11, country: "China", name: "EPL"},
+  {league: 589, yearr:-1, startmonth: 4, endmonth: 12, country: "Chinese-Taipei", name: "EPL"},
+  {league: 241, yearr:-1, startmonth: 3, endmonth: 12, country: "Colombia", name: "EPL"},
+  {league: 712, yearr:0, startmonth: 2, endmonth: 6, country: "Colombia", name: "EPL"},
+  {league: 239, yearr:0, startmonth: 1, endmonth: 5, country: "Colombia", name: "EPL"},
+  {league: 240, yearr:0, startmonth: 2, endmonth: 5, country: "Colombia", name: "EPL"},
+  {league: 713, yearr:0, startmonth: 1, endmonth: 2, country: "Colombia", name: "EPL"},
+  {league: 844, yearr:-1, startmonth: 1, endmonth: 3, country: "Congo", name: "EPL"},
+  {league: 424, yearr:-1, startmonth: 10, endmonth: 3, country: "Congo-DR", name: "EPL"},
+  {league: 958, yearr:-1, startmonth: 7, endmonth: 3, country: "Costa-Rica", name: "EPL"},
+  
+      // Add more leagues here
+]
+
+async function fetchFixturesByLeague(year: number, league: number, yearr: number): Promise<Fixture[]> { 
+    const cacheKey = `fixtures:league-${league}`;
+
+    // 🔥 1️⃣ Try fetching from Redis first
+    const cachedData = await redis.get(cacheKey);
+    if (cachedData) {
+        console.log(`✅ Returning cached data for ${league} from Redis`);
+        return typeof cachedData === "string" ? JSON.parse(cachedData) : cachedData;
+    }
+
+    console.log(`⚠️ No cache found, fetching ${league} fixtures from API...`);
+
+    // 2️⃣ Fetch from API (only if Redis has NO data)
+    const url = `https://v3.football.api-sports.io/fixtures?league=${league}&season=${year + yearr}`;
+    const options = {
+        method: "GET",
+        headers: { "X-RapidAPI-Key": process.env.API_KEY as string },
+    };
+
+    try {
+        const response = await fetch(url, options);
+        const data = await response.json();
+        const fixtures: Fixture[] = data.response || [];
+
+        // 3️⃣ Store in Redis permanently
+        await redis.set(cacheKey, JSON.stringify(fixtures));
+
+        return fixtures;
+    } catch (err) {
+        console.error(`❌ Error fetching ${league} fixtures:`, err);
+        return [];
+    }
+}
+
+export default async function getFixtures(): Promise<AllFixtures[]> {
+    try {
+        const currentTime = moment();
+        const year = currentTime.year();
+        const month = currentTime.month();
+
+        // 🔥 Fetch ALL leagues' data at once using `mget`
+        const cacheKeys = leagues.map(league => `fixtures:league-${league.league}`);
+        const cachedResults = await redis.mget(...cacheKeys);
+
+        const allFixturesByLeague: AllFixtures[] = [];
+
+        for (let i = 0; i < leagues.length; i++) {
+            const league = leagues[i];
+            const cachedData = cachedResults[i];
+
+            if (cachedData) {
+                console.log(`✅ Fast Redis Fetch for ${league.name}`);
+                allFixturesByLeague.push({
+                    name: league.name,
+                    fixtures: typeof cachedData === "string" ? JSON.parse(cachedData) : cachedData,
+                });
+            } else {
+                console.log(`⚠️ Cache miss for ${league.name}, fetching...`);
+                const fixtures = await fetchFixturesByLeague(year, league.league, league.yearr);
+                allFixturesByLeague.push({ name: league.name, fixtures });
+            }
+        }
+
+        return allFixturesByLeague;
+    } catch (error) {
+        console.error("❌ An error occurred while fetching fixtures:", error);
+        throw error;
+    }
+}
