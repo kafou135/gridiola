@@ -1,18 +1,8 @@
 import { AllFixtures, Fixture } from "@/types";
 import moment from 'moment';
 const API_KEY = process.env.API_KEY as string;
-import Redis from "ioredis";  // Use ioredis for Redis Labs, Aiven, or other Redis services
 
 // Redis setup
-
-  
-const redis = new Redis({
-    host: 'redis-17830.c56.east-us.azure.redns.redis-cloud.com',
-    password: '2f9BDB7oTGeMerXB4zN5lbuxvLWv3DuP',  // Optional, if required by the service
-    port: 17830,
-    username:'default'  // Default Redis port, change if your service uses a different one
-    
-  });
 
   
   
@@ -1011,7 +1001,8 @@ const leagues =    [
    {league: 910, yearr:0, startmonth: '2025-03-01', endmonth: '2025-04-01', country: "World", name: "EPL"},
    {league: 400,yearr:-1,startmonth: '2024-08-01',endmonth: '2025-04-01',country: "Zambia",name: "EPL"},
    {league: 401,yearr:0,startmonth: '2025-02-01',endmonth: '2025-04-01',country: "Zimbabwe",name: "EPL"}
- 
+
+   
     ]
 
     async function fetchFixturesByLeague(
@@ -1059,22 +1050,8 @@ const leagues =    [
             for (const chunk of leagueChunks) {
                 const fixturePromises = chunk.map(async (league) => {
                     if (currentTimeFormat > league.startmonth && currentTimeFormat < league.endmonth) {
-                        const cacheKey = `fixtures:league-${league.league}`;
-                        const cachedLiveDataPromise = redis.get(`${cacheKey}:LIVE`);
-                        const cachedLiveData = await cachedLiveDataPromise;
-                        const cachedFTDataPromise = redis.get(`${cacheKey}:FT`);
-                        const cachedFTData = await cachedFTDataPromise;
     
-                        if (cachedLiveData && cachedFTData) {
-                            console.log(`✅ Returning cached data for ${league.name} from Redis`);
-                            return {
-                                name: league.name,
-                                fixtures: [
-                                    ...JSON.parse(cachedLiveData),
-                                    ...JSON.parse(cachedFTData)
-                                ],
-                            };
-                        }
+                        
     
                         console.log(`⏳ Fetching fresh data for ${league.name}...`);
                         const fixtures = await fetchFixturesByLeague(year, league.league, league.yearr, lastWeek, nextWeek);
@@ -1085,18 +1062,9 @@ const leagues =    [
                         }
     
                         // Separate fixtures into finished (FT) and ongoing
-                        const finishedFixtures = fixtures.filter(f => f.fixture.status.short === "FT");
-                        const ongoingFixtures = fixtures.filter(f => f.fixture.status.short !== "FT");
-    
+                       
                         // Store FT fixtures in Redis for 7 days
-                        if (finishedFixtures.length > 0) {
-                            await redis.set(`${cacheKey}:FT`, JSON.stringify(finishedFixtures), "EX", 86400);
-                        }
-    
-                        // Store ongoing fixtures in Redis for 3 minutes, ensuring they persist until refresh
-                        if (ongoingFixtures.length > 0) {
-                            await redis.set(`${cacheKey}:LIVE`, JSON.stringify(ongoingFixtures), "EX", 60);
-                        }
+                       
     
                         return {
                             name: league.name,

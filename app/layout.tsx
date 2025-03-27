@@ -37,9 +37,6 @@ export default function RootLayout({
      data-ad-slot="8568517476"
      data-ad-format="auto"
      data-full-width-responsive="true"></ins>
-<Script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</Script>
         {/* Simple Background */}
         <div className="min-h-screen bg-gray-900"> {/* Changed to solid dark background */}
           {/* Content */}
