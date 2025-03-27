@@ -1,7 +1,7 @@
 import { AllFixtures, ResponseOdds } from '@/types'
 import StandingsAndFixtures from './components/home2/StandingsAndFixtures'
 import getFixturesForFiveLeagues from './util/getFixturesForFiveLeagues';
-
+import RefreshButton from '@/my comopnents/RefreshButton';
 export const revalidate = 60;
 
 export default async function Home() {
@@ -14,6 +14,7 @@ export default async function Home() {
 
   return (
   <div>
+              <RefreshButton /> {/* Add the RefreshButton here */}
         <StandingsAndFixtures filteredFixtures={filteredFixtures}/>
     </div>
   )
