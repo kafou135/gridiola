@@ -18,7 +18,6 @@ type PageProps = {
 export default function FixtureItem({ match, index }: PageProps) {
     const router = useRouter();
 
-
     return (
         <Link
             href={`/match/${match.fixture.id}`}
@@ -85,19 +84,24 @@ export default function FixtureItem({ match, index }: PageProps) {
                 {match.fixture.status.short === "BT" && (
                     <div className="text-sm text-red-600">Break Time</div>
                 )}
+                {["1H"].includes(match.fixture.status.short) && (
     <div className="text-xs text-red-600">
         {match.fixture.status.elapsed >= 45 ? `45+${match.fixture.status.elapsed - 44}` : match.fixture.status.elapsed}
         <span className="inline-block animate-ping">′</span>
     </div>
+)}
+                {["2H"].includes(match.fixture.status.short) && (
     <div className="text-xs text-red-600">
         {match.fixture.status.elapsed >= 90 ? `90+${match.fixture.status.elapsed - 89}` : match.fixture.status.elapsed}
         <span className="inline-block animate-ping">′</span>
     </div>
-
+)}
+                {["ET"].includes(match.fixture.status.short) && (
     <div className="text-xs text-red-600">
         {match.fixture.status.elapsed+1}
         <span className="inline-block animate-ping">′</span>
     </div>
+)}
 
                 {match.fixture.status.short === "NS" && (
                     <div className="text-xs text-gray-500">{match.fixture.venue.name}, {match.fixture.venue.city}</div>
