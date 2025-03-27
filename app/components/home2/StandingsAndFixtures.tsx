@@ -69,7 +69,7 @@ export default function StandingsAndFixtures({ filteredFixtures }: { filteredFix
     }, []);
 
     return (
-        <div className="flex flex-wrap w-full bg-gray-900 p-6 rounded-lg shadow-xl border border-gray-700">
+        <div className="flex flex-wrap w-full bg-gray-900 p-6 rounded-lg shadow-xl border border-gray-900">
             {/* Sidebar with League Buttons */}
             <div className="w-full md:w-1/4 bg-gray-600 shadow-md p-4 rounded-lg overflow-x-auto">
                 {menuItems.map((league, i) => (
