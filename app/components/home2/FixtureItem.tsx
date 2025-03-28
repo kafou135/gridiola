@@ -17,6 +17,19 @@ type PageProps = {
 
 export default function FixtureItem({ match, index }: PageProps) {
     const router = useRouter();
+    const [elapsedTime, setElapsedTime] = useState(match.fixture.status.elapsed);
+
+    useEffect(() => {
+        if (["1H", "2H", "ET"].includes(match.fixture.status.short)) {
+            const interval = setInterval(() => {
+                setElapsedTime(prevTime => prevTime + 1);
+            }, 60000); // Updates every minute
+    
+            return () => clearInterval(interval);
+        }
+    }, [match.fixture.status.short]);
+    
+    
 
     return (
         <Link
@@ -86,19 +99,19 @@ export default function FixtureItem({ match, index }: PageProps) {
                 )}
                 {["1H"].includes(match.fixture.status.short) && (
     <div className="text-xs text-red-600">
-        {match.fixture.status.elapsed >= 45 ? `45+${match.fixture.status.elapsed - 44}` : match.fixture.status.elapsed}
+        {elapsedTime >= 45 ? `45+${elapsedTime - 44}` : elapsedTime}
         <span className="inline-block animate-ping">′</span>
     </div>
 )}
                 {["2H"].includes(match.fixture.status.short) && (
     <div className="text-xs text-red-600">
-        {match.fixture.status.elapsed >= 90 ? `90+${match.fixture.status.elapsed - 89}` : match.fixture.status.elapsed}
+        {elapsedTime >= 90 ? `90+${elapsedTime - 89}` : elapsedTime}
         <span className="inline-block animate-ping">′</span>
     </div>
 )}
                 {["ET"].includes(match.fixture.status.short) && (
     <div className="text-xs text-red-600">
-        {match.fixture.status.elapsed+1}
+        {elapsedTime+1}
         <span className="inline-block animate-ping">′</span>
     </div>
 )}
