@@ -40,7 +40,7 @@ export default function Fixtures({ fixturesByTeamId, teamId }: PageProps) {
                     {firstItemsFixturesFuture.map((fixture) => (
                         <Link key={fixture.fixture.id} href={`/match/${fixture.fixture.id}`} className="w-full flex-shrink-0 flex items-center bg-gray-700 hover:bg-red-800 rounded-md p-4">
                             <div className="flex flex-col items-center w-3/12 text-sm">
-                                <Image src={fixture.teams.home.logo} alt="HomeLogo" width={50} height={50} className="rounded-full" />
+                                <Image src={fixture.teams.home.logo} alt="HomeLogo" width={50} height={50}  />
                                 <div>{fixture.teams.home.name}</div>
                             </div>
                             <div className="flex flex-col items-center w-6/12 text-xs md:text-sm">
@@ -50,7 +50,7 @@ export default function Fixtures({ fixturesByTeamId, teamId }: PageProps) {
                                 <div className="text-center">{fixture.fixture.venue.name}</div>
                             </div>
                             <div className="flex flex-col items-center w-3/12 text-sm">
-                                <Image src={fixture.teams.away.logo} alt="AwayLogo" width={50} height={50} className="rounded-full" />
+                                <Image src={fixture.teams.away.logo} alt="AwayLogo" width={50} height={50}  />
                                 <div>{fixture.teams.away.name}</div>
                             </div>
                         </Link>
@@ -65,7 +65,7 @@ export default function Fixtures({ fixturesByTeamId, teamId }: PageProps) {
             {fixturesDone.slice(0, visibleItemsCount).map((fixture, i) => (
                 <Link key={fixture.fixture.id} href={`/match/${fixture.fixture.id}`} className="w-full flex items-center bg-gray-700 hover:bg-red-800 rounded-md p-4 mb-2">
                     <div className="flex flex-col items-center w-3/12 text-sm">
-                        <Image src={fixture.teams.home.logo} alt="HomeLogo" width={50} height={50} className="rounded-full" />
+                        <Image src={fixture.teams.home.logo} alt="HomeLogo" width={50} height={50}  />
                         <div>{fixture.teams.home.name}</div>
                     </div>
                     <div className="flex flex-col items-center w-6/12 text-xs md:text-sm">
@@ -75,7 +75,7 @@ export default function Fixtures({ fixturesByTeamId, teamId }: PageProps) {
                         <div className="text-center">{fixture.fixture.venue.name}</div>
                     </div>
                     <div className="flex flex-col items-center w-3/12 text-sm">
-                        <Image src={fixture.teams.away.logo} alt="AwayLogo" width={50} height={50} className="rounded-full" />
+                        <Image src={fixture.teams.away.logo} alt="AwayLogo" width={50} height={50}  />
                         <div>{fixture.teams.away.name}</div>
                     </div>
                 </Link>

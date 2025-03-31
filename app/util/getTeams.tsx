@@ -2,10 +2,10 @@ import { Standing, Team } from '@/types';
 import 'server-only';
 import getStandings from './getStandings1';
 
-export default async function getTeams(): Promise<Team[]> {
+export default async function getTeams(teamid: number,teamName:string,season:number,leagueid:number): Promise<Team[]> {
 
     try {
-        const standings: Standing[] = await getStandings();
+        const standings: Standing[] = await getStandings(teamName,season,leagueid);
 
         const teams: Team[] = [];
 

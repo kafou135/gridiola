@@ -2,12 +2,12 @@ import { Team } from '@/types';
 import 'server-only';
 import getTeams from './getTeams';
 
-export default async function getTeamInfoByTeamId(id: number): Promise<Team | undefined> {
+export default async function getTeamInfoByTeamId(teamid: number,teamName:string,season:number,leagueid:number): Promise<Team | undefined> {
     try {
-        const teams: Team[] = await getTeams();
+        const teams: Team[] = await getTeams(teamid,teamName,season,leagueid);
 
         for (const team of teams) {
-            if (team.team.id === id) {
+            if (team.team.id === teamid) {
                 return team;
             }
         }

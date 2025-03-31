@@ -1,18 +1,18 @@
 import { Fixture } from '@/types';
 import 'server-only';
-import getFixtures from './getFixtures';
+import getFixtures from './getFixtures1';
 import moment from 'moment';
 
 
-export default async function getFixturesByTeamId(id: number): Promise<Fixture[]> {
+export default async function getFixturesByTeamId(teamid: number,teamName:string,season:number,leagueid:number): Promise<Fixture[]> {
     try {
-        const allFixturesByLeague = await getFixtures();
+        const allFixturesByLeague = await getFixtures(teamName,season,leagueid);
 
         const fixturesByTeamId: Fixture[] = [];
 
         for (const league of allFixturesByLeague) {
             for (const fixture of league.fixtures) {
-                if (fixture.teams.home.id === id || fixture.teams.away.id === id) {
+                if (fixture.teams.home.id === teamid || fixture.teams.away.id === teamid) {
                     fixturesByTeamId.push(fixture);
                 }
             }

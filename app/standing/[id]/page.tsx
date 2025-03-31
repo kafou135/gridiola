@@ -3,8 +3,7 @@ import { Fixture,Standing } from "@/types"
 import type { Team, Topscorers } from "@/types"
 import Image from "next/image"
 import Fixtures from "./components/standing"
-import getFixturesByTeamId from "@/app/util/getFixturesByTeamId"
-import getStandings from "@/app/util/getStanding"
+
 import getTopScorersBatch from "@/app/util/getPlayers"
 import getStandingsBatch from "@/app/util/getStanding"
 
@@ -25,14 +24,14 @@ export default async function Team({
 
 // Assuming id and yearr are variables
 // Assuming you have id and yearr variables for a single league
-const standingsData: Standing[] = (await getStandingsBatch([{ id: Number(id), yearr: Number(yearr) }]))[Number(id)] || [];
+const standingsData: Standing[] = await getStandingsBatch(Number(yearr),Number(id))
 
 // This retrieves the standings for the specific league by the id
-    const topscorers:Topscorers[] = (await getTopScorersBatch([{id:Number(id),yearr:Number(yearr)}]))[Number(id)] || [];
+    const topscorers:Topscorers[] = await getTopScorersBatch(Number(yearr),Number(id))
 
     return (
 
-        <div>
+        <div className="laptop-only">
                     <Fixtures standingsData={standingsData} topscorers={topscorers}/>
             </div>
     );

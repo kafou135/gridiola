@@ -14,9 +14,20 @@ type PageProps = {
 export default async function Team({
     params
 }: PageProps) {
-
-    let teamInfo: Team | undefined = await getTeamInfoByTeamId(parseInt(params.id));
-    let fixturesByTeamId: Fixture[] = await getFixturesByTeamId(parseInt(params.id));
+    const match = params.id.match(/(\d+)nm(.*?)seas(\d+)lid(\d+)/);
+    if (!match) {
+        return (
+            <div className="flex justify-center items-center text-neutral-100 py-5">
+                <p className="text-red-500 text-lg">Invalid Team ID format</p>
+            </div>
+        );
+    }
+    const teamId = parseInt(match[1]); // Extracts the numeric team ID
+    const teamName = match[2]; // Extracts the team name
+    const season = parseInt(match[3]); // Extracts the season
+    const leagueid = parseInt(match[4]); // Extracts the season
+    let teamInfo: Team | undefined = await getTeamInfoByTeamId(teamId,teamName,season,leagueid);
+    let fixturesByTeamId: Fixture[] = await getFixturesByTeamId(teamId,teamName,season,leagueid);
 
     if (!teamInfo) {
         return (
@@ -37,7 +48,7 @@ export default async function Team({
                         alt="TeamLogo"
                         width={150}
                         height={150}
-                        className="p-3 rounded-full border-2 border-gray-700"
+                        className="p-3 border-2 border-gray-700"
                     />
                     <div className="text-2xl font-bold mt-3">{teamInfo.team.name}</div>
                     <div className="flex justify-center items-center w-full mt-2 text-lg font-semibold">

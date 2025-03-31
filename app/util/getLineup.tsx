@@ -1,12 +1,15 @@
 import "server-only";
 import { Lineups } from "@/types";
-import { Redis } from "@upstash/redis";
+import { Redis } from "ioredis";
 
 const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL!,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
-
+    host: 'redis-10829.c325.us-east-1-4.ec2.redns.redis-cloud.com',
+    password: 'wrjsIJihA6rAyPjiFSiIhazWbfW2lMgC',  // Optional, if required by the service
+    port: 10829,
+    username:'default',  // Default Redis port, change if your service uses a different one
+    maxRetriesPerRequest: null, // Prevents unnecessary reconnections
+    enableOfflineQueue: false, // Avoids memory issues
+  });
 // Function to fetch lineup data for a single fixture
 async function fetchLineup(id: number, API_KEY: string): Promise<Lineups[]> {
     const url = `https://v3.football.api-sports.io/fixtures/lineups?fixture=${id}`;
@@ -62,8 +65,8 @@ export default async function getLineupBatch(ids: number[]): Promise<Record<numb
 
         // Fetch lineup data in batches of 60 fixtures
         const fetchPromises: Promise<{ key: number; lineup: Lineups[] }>[] = [];
-        for (let i = 0; i < idsToFetch.length; i += 60) {
-            const batch = idsToFetch.slice(i, i + 60);
+        for (let i = 0; i < idsToFetch.length; i += 10) {
+            const batch = idsToFetch.slice(i, i + 10);
             fetchPromises.push(
                 ...batch.map(async (id) => {
                     const lineup = await fetchLineup(id, API_KEY);
@@ -80,7 +83,7 @@ export default async function getLineupBatch(ids: number[]): Promise<Record<numb
 
         // Store fresh results in Redis (expires in 2 weeks)
         const redisSetOperations = freshResults.map(({ key, lineup }) =>
-            redis.set(`lineup:${key}`, JSON.stringify(lineup), { ex: 1209600 }) // Cache for 2 weeks
+            redis.set(`lineup:${key}`, JSON.stringify(lineup),  "EX", 180) // Cache for 2 weeks
         );
         await Promise.all(redisSetOperations);
 

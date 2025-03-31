@@ -1,12 +1,15 @@
 import "server-only";
 import { H2H } from "@/types";
-import { Redis } from "@upstash/redis";
+import { Redis } from "ioredis";
 
 const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL!,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
-
+    host: 'redis-10829.c325.us-east-1-4.ec2.redns.redis-cloud.com',
+    password: 'wrjsIJihA6rAyPjiFSiIhazWbfW2lMgC',  // Optional, if required by the service
+    port: 10829,
+    username:'default',  // Default Redis port, change if your service uses a different one
+    maxRetriesPerRequest: null, // Prevents unnecessary reconnections
+    enableOfflineQueue: false, // Avoids memory issues
+  });
 // Function to fetch H2H data from API
 async function fetchH2H(id1: number, id2: number, API_KEY: string): Promise<H2H[]> {
     const url = `https://v3.football.api-sports.io/fixtures/headtohead?h2h=${id1}-${id2}`;
@@ -62,8 +65,8 @@ export default async function getH2HBatch(pairs: [number, number][]): Promise<Re
 
         // Fetch H2H data in batches of 60 pairs
         const fetchPromises: Promise<{ key: string; h2h: H2H[] }>[] = [];
-        for (let i = 0; i < pairsToFetch.length; i += 60) {
-            const batch = pairsToFetch.slice(i, i + 60);
+        for (let i = 0; i < pairsToFetch.length; i += 10) {
+            const batch = pairsToFetch.slice(i, i + 10);
             fetchPromises.push(
                 ...batch.map(async ([id1, id2]) => {
                     const h2h = await fetchH2H(id1, id2, API_KEY);
@@ -80,7 +83,7 @@ export default async function getH2HBatch(pairs: [number, number][]): Promise<Re
 
         // Store fresh results in Redis (expires in 2 weeks)
         const redisSetOperations = freshResults.map(({ key, h2h }) =>
-            redis.set(`h2h:${key}`, JSON.stringify(h2h), { ex: 1209600 }) // Cache for 2 weeks
+            redis.set(`h2h:${key}`, JSON.stringify(h2h),  "EX", 180 ) // Cache for 2 weeks
         );
         await Promise.all(redisSetOperations);
 

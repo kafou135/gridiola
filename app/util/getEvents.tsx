@@ -1,12 +1,15 @@
 import "server-only";
 import { Events } from "@/types";
-import { Redis } from "@upstash/redis";
+import { Redis } from "ioredis";
 
 const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL!,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
-
+    host: 'redis-10829.c325.us-east-1-4.ec2.redns.redis-cloud.com',
+    password: 'wrjsIJihA6rAyPjiFSiIhazWbfW2lMgC',  // Optional, if required by the service
+    port: 10829,
+    username:'default',  // Default Redis port, change if your service uses a different one
+    maxRetriesPerRequest: null, // Prevents unnecessary reconnections
+    enableOfflineQueue: false, // Avoids memory issues
+  });
 // Function to fetch events for a single fixture
 async function getH2H(id: number, API_KEY: string): Promise<Events[]> {
     const url = `https://v3.football.api-sports.io/fixtures/events?fixture=${id}`;
@@ -53,7 +56,7 @@ export default async function getEventsBatch(fixtureIds: number[]): Promise<Reco
             }
         });
 
-        if (!fixturesToFetch||fixturesToFetch.length === 2) {
+        if (fixturesToFetch.length === 2) {
             console.log("✅ All requested events found in Redis cache.");
             return results;
         }
@@ -62,8 +65,8 @@ export default async function getEventsBatch(fixtureIds: number[]): Promise<Reco
 
         // Fetch events in batches of 60 fixtures
         const fetchPromises: Promise<{ id: number; events: Events[] }>[] = [];
-        for (let i = 0; i < fixturesToFetch.length; i += 60) {
-            const batch = fixturesToFetch.slice(i, i + 60);
+        for (let i = 0; i < fixturesToFetch.length; i += 10) {
+            const batch = fixturesToFetch.slice(i, i + 10);
             fetchPromises.push(
                 ...batch.map(async (id) => {
                     const events = await getH2H(id, API_KEY);
@@ -80,7 +83,7 @@ export default async function getEventsBatch(fixtureIds: number[]): Promise<Reco
 
         // Store fresh results in Redis (expires in 2 weeks)
         const redisSetOperations = freshResults.map(({ id, events }) =>
-            redis.set(`event:${id}`, JSON.stringify(events), { ex: 1209600 }) // 2 weeks
+            redis.set(`event:${id}`, JSON.stringify(events),  "EX", 180 ) // 2 weeks
         );
         await Promise.all(redisSetOperations);
 

@@ -115,7 +115,7 @@ export default function Match({ standingsData,topscorers }: PageProps) {
 
                                                     {/* Teams */}
                                                     {responseData.league.standings[0].map((team, j) => (
-                                                        <Link href={`/team/${team.team.id}`} key={j + team.team.name} className={`flex w-full p-2 hover:bg-red-800/50 rounded-lg ${j % 2 === 0 ? 'bg-black/40' : 'bg-gray-700'}`}>
+                                                        <Link href={`/team/${team.team.id}nm${team.team.name}seas${responseData.league.season}lid${responseData.league.id}`} key={j + team.team.name} className={`flex w-full p-2 hover:bg-red-800/50 rounded-lg ${j % 2 === 0 ? 'bg-black/40' : 'bg-gray-700'}`}>
                                                             <div className="w-1/12 flex px-2 justify-center items-center text-xs md:text-sm">{j + 1}</div>
                                                             <div className="w-3/12 flex text-xs md:text-sm items-center">
                                                                 <img src={team.team.logo} alt={team.team.name} className="w-6 h-6 mr-2" />
