@@ -21,7 +21,6 @@ type PageProps = {
 
 export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: PageProps) {
   
-    console.log('H2HHHH2H2H2H2H2H2',events);
     const [activeTab, setActiveTab] = useState("summary"); // Default tab
 
     if (!fixtureByFixtureId) {
@@ -825,7 +824,7 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
                 <div className="w-1/3 flex flex-col justify-center items-center">
                     <Link href={`../team/${fixtureByFixtureId.teams.home.id}nm${fixtureByFixtureId.league.name}seas${fixtureByFixtureId.league.season}lid${fixtureByFixtureId.league.id}`}>
                         <Image
-                            src={fixtureByFixtureId.teams.home.logo}
+                            src={`https://media.api-sports.io/football/teams/${fixtureByFixtureId.teams.home.id}.png`}
                             alt="HomeLogoMatch"
                             width={80}
                             height={80}
@@ -872,7 +871,7 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
                 <div className="w-1/3 flex flex-col justify-center items-center">
                 <Link href={`../team/${fixtureByFixtureId.teams.away.id}nm${fixtureByFixtureId.league.name}seas${fixtureByFixtureId.league.season}lid${fixtureByFixtureId.league.id}`}>
                 <Image
-                            src={fixtureByFixtureId.teams.away.logo}
+                            src={`https://media.api-sports.io/football/teams/${fixtureByFixtureId.teams.away.id}.png`}
                             alt="AwayLogoMatch"
                             width={80}
                             height={80}
@@ -1020,12 +1019,12 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
                    <div className="relative w-full max-w-3xl h-[500px]">
                                               {/* Home Team Formation (Top Left) */}
                                                   <div className="absolute top-2 left-2 bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-bold z-10">
-                                                      {lineups[0].formation}
+                                                      {lineups[0]?.formation}
                                                   </div>
                                               
                                                   {/* Away Team Formation (Top Right) */}
                                                   <div className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-md text-sm font-bold z-10">
-                                                      {lineups[1].formation}
+                                                      {lineups[1]?.formation}
                                                   </div>
                                               
                                                   {/* Field Image */}
@@ -1039,7 +1038,7 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
                                                   />
                                               
                                                   {/* Home Team Players */}
-                                                  {lineups[0].startXI.map((player) => {
+                                                  {lineups[0]?.startXI.map((player) => {
                                                       if (player.player.grid.length!=3) return null
                                                                   const [x, y] = player.player.grid.split(":").map(Number);
                                                                   const positionTop = getTopPositionForHome(player.player.pos, y,x);
@@ -1094,7 +1093,7 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
                                                   })}
                                               
                                                   {/* Away Team Players */}
-                                                  {lineups[1].startXI.map((player) => {
+                                                  {lineups[1]?.startXI.map((player) => {
                                                       if (!player.player.grid) return null
                                                       const [x, y] = player.player.grid.split(":").map(Number);
                                                       const positionTop = getTopPositionForAway(player.player.pos, y, x);
@@ -1157,14 +1156,14 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
                     <div className="w-1/2 p-2">
                         <h3 className="text-sm font-bold text-center">{fixtureByFixtureId.teams.home.name}</h3>
                         <p className="text-xs text-center text-gray-400">
-                            {lineups[0].formation ? `Formation: ${lineups[0].formation}` : "Formation data not available"}
+                            {lineups[0]?.formation ? `Formation: ${lineups[0]?.formation}` : "Formation data not available"}
                         </p>
                         
                         {/* Starting XI */}
                         <div className="mt-3 bg-gray-700 p-2 rounded-md shadow">
                             <h4 className="text-xs font-semibold text-center text-yellow-400">Starting XI</h4>
                             <ul className="text-xs">
-                                {lineups[0].startXI.map((player) => (
+                                {lineups[0]?.startXI.map((player) => (
                                     <li key={player.player.id} className="py-1">
                                         {player.player.name} ({player.player.number})
                                     </li>
@@ -1176,7 +1175,7 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
                         <div className="mt-3 bg-gray-900 p-2 rounded-md shadow">
                             <h4 className="text-xs font-semibold text-center text-blue-400">Substitutes</h4>
                             <ul className="text-xs text-gray-300 italic">
-                                {lineups[0].substitutes.length > 0 ? (
+                                {lineups[0]?.substitutes.length > 0 ? (
                                     lineups[0].substitutes.map((player) => (
                                         <li key={player.player.id} className="py-1">
                                             {player.player.name} ({player.player.number})
@@ -1190,7 +1189,7 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
                         {/* Coach */}
                         <div className="mt-3 bg-gray-900 p-2 rounded-md shadow">
                             <h4 className="text-xs font-semibold text-center text-red-400">coach</h4>
-                          {lineups[0].coach && (
+                          {lineups[0]?.coach && (
                               <div className="text-white text-sm mt-2">
                                   <span className="font-bold"></span>{lineups[0].coach.name}
                               </div>
@@ -1202,14 +1201,14 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
                     <div className="w-1/2 p-2">
                         <h3 className="text-sm font-bold text-center">{fixtureByFixtureId.teams.away.name}</h3>
                         <p className="text-xs text-center text-gray-400">
-                            {lineups[1].formation ? `Formation: ${lineups[1].formation}` : "Formation data not available"}
+                            {lineups[1]?.formation ? `Formation: ${lineups[1]?.formation}` : "Formation data not available"}
                         </p>
                         
                         {/* Starting XI */}
                         <div className="mt-3 bg-gray-700 p-2 rounded-md shadow">
                             <h4 className="text-xs font-semibold text-center text-yellow-400">Starting XI</h4>
                             <ul className="text-xs">
-                                {lineups[1].startXI.map((player) => (
+                                {lineups[1]?.startXI.map((player) => (
                                     <li key={player.player.id} className="py-1">
                                         {player.player.name} ({player.player.number})
                                     </li>
@@ -1221,7 +1220,7 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
                         <div className="mt-3 bg-gray-900 p-2 rounded-md shadow">
                             <h4 className="text-xs font-semibold text-center text-blue-400">Substitutes</h4>
                             <ul className="text-xs text-gray-300 italic">
-                                {lineups[1].substitutes.length > 0 ? (
+                                {lineups[1]?.substitutes.length > 0 ? (
                                     lineups[1].substitutes.map((player) => (
                                         <li key={player.player.id} className="py-1">
                                             {player.player.name} ({player.player.number})
@@ -1235,7 +1234,7 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
                         {/* Coach */}
                         <div className="mt-3 bg-gray-900 p-2 rounded-md shadow">
                             <h4 className="text-xs font-semibold text-center text-red-400">coach</h4>
-                          {lineups[1].coach && (
+                          {lineups[1]?.coach && (
                               <div className="text-white text-sm mt-2">
                                   <span className="font-bold"></span>{lineups[1].coach.name}
                               </div>
@@ -1249,14 +1248,14 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
 
             {activeTab === "h2h" && (
                 <div className="flex flex-col w-full max-w-3xl justify-center items-center mt-6 p-4 bg-gray-800 rounded-lg shadow-md">
-                  {h2h.slice(0, 5).map((match, index) => (
+                  {h2h?.slice(0, 5).map((match, index) => (
                                               <div key={index} className="flex w-full justify-between items-center bg-gray-700 p-3 my-1 rounded-md">
                                                   <div className="text-xs text-gray-400">
                                                       {new Date(match.fixture.date).toLocaleDateString()}
                                                   </div>
                                                   <div className="w-1/3 flex flex-col items-center">
                                                       <Image
-                                                          src={match.teams.home.logo}
+                                                            src={`https://media.api-sports.io/football/teams/${match.teams.home.id}.png`}
                                                           alt={match.teams.home.name}
                                                           width={40}
                                                           height={40}
@@ -1272,8 +1271,8 @@ export default async function Match({ fixtureByFixtureId,h2h,lineups,events }: P
                                                   </div>
                                                   <div className="w-1/3 flex flex-col items-center">
                                                       <Image
-                                                          src={match.teams.away.logo}
-                                                          alt={match.teams.away.name}
+                                                            src={`https://media.api-sports.io/football/teams/${match.teams.away.id}.png`}
+                                                            alt={match.teams.away.name}
                                                           width={40}
                                                           height={40}
                                                       />
