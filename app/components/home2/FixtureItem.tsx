@@ -38,7 +38,7 @@ export default function FixtureItem({ match, index }: PageProps) {
             className={`flex w-full p-3 bm-0 justify-between items-center h-24 hover:bg-red-800/50 ${index % 2 === 0 ? 'bg-black/40' : ''} rounded-md shadow-md`}
         >
             <div className="flex items-center justify-center w-1/4">
-                <Image src={match.teams.home.logo} alt="HomeLogo" width={50} height={50} />
+                <Image src={`https://media.api-sports.io/football/teams/${match.teams.home.id}.png`} alt="HomeLogo" width={50} height={50} />
                 <span className="ml-2 text-sm text-white">{match.teams.home.name}</span>
             </div>
 
@@ -122,7 +122,7 @@ export default function FixtureItem({ match, index }: PageProps) {
             </div>
 
             <div className="flex items-center justify-center w-1/4">
-                <Image src={match.teams.away.logo} alt="AwayLogo" width={50} height={50} />
+                <Image src={`https://media.api-sports.io/football/teams/${match.teams.away.id}.png`} alt="AwayLogo" width={50} height={50} />
                 <span className="ml-2 text-sm text-white">{match.teams.away.name}</span>
             </div>
         </Link>
